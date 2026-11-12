@@ -20,6 +20,9 @@ pub mod math;
 pub mod modulation;
 pub mod ofdm;
 
+pub use channel::{Awgn, Channel, Rayleigh};
+pub use modulation::{Bpsk, Modulation, Qam16, Qam64, Qpsk};
+pub use ofdm::{Ofdm, OfdmImpl};
 pub use sig6g_core::Complex32;
 
 use core::fmt;

@@ -23,6 +23,17 @@ const HEADER_LEN: usize = 8;
 const CURRENT_VERSION: u8 = 1;
 
 /// Frame yang di-parse (payload sebagai slice peminjam, zero-copy).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_link::frame::Frame;
+///
+/// let payload: &[u8] = b"data";
+/// let frame = Frame { ver: 1, r#type: 0, seq: 3, payload };
+/// assert_eq!(frame.seq, 3);
+/// assert_eq!(frame.payload, b"data");
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Frame<'a> {
     pub ver: u8,
@@ -55,6 +66,19 @@ fn crc16_ccitt(data: &[u8]) -> u16 {
 /// Mengembalikan [`Error::TooShort`], [`Error::BadMagic`],
 /// [`Error::BadVersion`], [`Error::LengthExceeds`], atau
 /// [`Error::BadCrc`].
+///
+/// # Example
+///
+/// ```
+/// use sig6g_link::frame::{parse_frame, serialize_frame};
+///
+/// let payload = b"hello";
+/// let framed = serialize_frame(1, 0, 7, payload);
+/// let (frame, consumed) = parse_frame(&framed).unwrap();
+/// assert_eq!(consumed, framed.len());
+/// assert_eq!(frame.seq, 7);
+/// assert_eq!(frame.payload, payload);
+/// ```
 pub fn parse_frame(buf: &[u8]) -> Result<(Frame<'_>, usize), Error> {
     if buf.len() < HEADER_LEN {
         return Err(Error::TooShort);
@@ -94,6 +118,18 @@ pub fn parse_frame(buf: &[u8]) -> Result<(Frame<'_>, usize), Error> {
 }
 
 /// Susun frame ke `Vec<u8>`.
+///
+/// # Example
+///
+/// ```
+/// use sig6g_link::frame::serialize_frame;
+///
+/// let framed = serialize_frame(1, 0, 7, b"hello");
+/// assert_eq!(framed[0], 0x53); // magic 'S'
+/// assert_eq!(framed[1], 0x49); // magic 'I'
+/// assert_eq!(framed[2], 1);    // version
+/// assert_eq!(framed[3], 0);    // type data
+/// ```
 #[must_use]
 pub fn serialize_frame(ver: u8, r#type: u8, seq: u16, payload: &[u8]) -> Vec<u8> {
     let mut out = Vec::with_capacity(HEADER_LEN + payload.len() + 2);

@@ -23,4 +23,7 @@ Format: `YYYY-MM-DD | topik | ringkasan | angka/keterangan`
   terkompilasi), parser frame zero-copy (magic/ver/type/length/seq/payload/crc16,
   CRC-16-CCITT), fuzz target frame_parser. 43 tes lulus (core 12 + link 12 +
   phy 19), clippy pedantic+nursery -D warnings, fmt bersih, semua gerbang
-  CI (termasuk benchmark regresi <=3%) hijau.
+  CI (termasuk benchmark regresi <=3% dengan 3x pengukuran + max) hijau.
+  Doc examples (runnable) ditambahkan ke semua item publik M1 (Modulation,
+  Ofdm, Awgn, Rayleigh, math) dan M2 (Idle/Acquiring/Synced/Connected,
+  Frame, parse_frame, serialize_frame) — divalidasi via cargo test --doc.

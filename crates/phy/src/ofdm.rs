@@ -131,6 +131,25 @@ impl<const N: usize, const CP: usize> Default for OfdmImpl<N, CP> {
 }
 
 impl<const N: usize, const CP: usize> OfdmImpl<N, CP> {
+    /// Buat instance OFDM baru.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use sig6g_phy::{Complex32, ofdm::{Ofdm, OfdmImpl}};
+    ///
+    /// let ofdm = OfdmImpl::<64, 16>::new();
+    /// let symbols: [Complex32; 64] = core::array::from_fn(|i| {
+    ///     if i % 2 == 0 { Complex32::new(1, 0) } else { Complex32::new(-1, 0) }
+    /// });
+    /// let mut tx = [Complex32::zero(); 80];
+    /// let mut rx = [Complex32::zero(); 64];
+    /// let n = ofdm.modulate(&symbols, &mut tx).unwrap();
+    /// assert_eq!(n, 64 + 16);
+    /// let m = ofdm.demodulate(&tx, &mut rx).unwrap();
+    /// assert_eq!(m, 64);
+    /// assert_eq!(rx, symbols);
+    /// ```
     #[must_use]
     pub const fn new() -> Self {
         Self {

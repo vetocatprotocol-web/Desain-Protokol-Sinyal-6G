@@ -7,6 +7,15 @@
 use core::f64::consts::PI;
 
 /// Sinus via deret Taylor dengan reduksi rentang ke [-pi, pi].
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert!((math::sin(0.0) - 0.0).abs() < 1e-10);
+/// assert!((math::sin(core::f64::consts::PI / 2.0) - 1.0).abs() < 1e-8);
+/// ```
 #[must_use]
 #[allow(clippy::while_float, clippy::cast_precision_loss)]
 pub fn sin(x: f64) -> f64 {
@@ -28,12 +37,30 @@ pub fn sin(x: f64) -> f64 {
 }
 
 /// Kosinus via sin(x + pi/2).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert!((math::cos(0.0) - 1.0).abs() < 1e-10);
+/// assert!((math::cos(core::f64::consts::PI) + 1.0).abs() < 1e-8);
+/// ```
 #[must_use]
 pub fn cos(x: f64) -> f64 {
     sin(x + PI / 2.0)
 }
 
 /// Akar kuadrat via metode Newton.
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert!((math::sqrt(4.0) - 2.0).abs() < 1e-10);
+/// assert!((math::sqrt(2.0) * math::sqrt(2.0) - 2.0).abs() < 1e-8);
+/// ```
 #[must_use]
 pub fn sqrt(x: f64) -> f64 {
     if x <= 0.0 {
@@ -51,6 +78,15 @@ pub fn sqrt(x: f64) -> f64 {
 }
 
 /// Logaritma natural via atanh: ln(x) = 2 * atanh((x-1)/(x+1)).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert!((math::ln(1.0) - 0.0).abs() < 1e-10);
+/// assert!((math::ln(math::exp(1.0)) - 1.0).abs() < 1e-8);
+/// ```
 #[must_use]
 #[allow(clippy::cast_precision_loss)]
 pub fn ln(x: f64) -> f64 {
@@ -69,6 +105,15 @@ pub fn ln(x: f64) -> f64 {
 }
 
 /// Eksponensial via deret Taylor.
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert!((math::exp(0.0) - 1.0).abs() < 1e-10);
+/// assert!((math::exp(1.0) - core::f64::consts::E).abs() < 1e-6);
+/// ```
 #[must_use]
 #[allow(clippy::cast_precision_loss)]
 pub fn exp(x: f64) -> f64 {
@@ -85,6 +130,14 @@ pub fn exp(x: f64) -> f64 {
 }
 
 /// x^y = exp(y * ln(x)).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert!((math::powf(2.0, 3.0) - 8.0).abs() < 1e-6);
+/// ```
 #[must_use]
 #[allow(clippy::cast_precision_loss)]
 pub fn powf(x: f64, y: f64) -> f64 {
@@ -92,6 +145,16 @@ pub fn powf(x: f64, y: f64) -> f64 {
 }
 
 /// Pembulatan ke i32 (setengah menjauh dari nol).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert_eq!(math::round_i32(1.2), 1);
+/// assert_eq!(math::round_i32(1.5), 2);
+/// assert_eq!(math::round_i32(-1.5), -2);
+/// ```
 #[must_use]
 #[allow(clippy::cast_possible_truncation)]
 pub fn round_i32(x: f64) -> i32 {
@@ -103,6 +166,16 @@ pub fn round_i32(x: f64) -> i32 {
 }
 
 /// Nilai mutlak.
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::math;
+///
+/// assert_eq!(math::abs(-3.5), 3.5);
+/// assert_eq!(math::abs(3.5), 3.5);
+/// assert_eq!(math::abs(0.0), 0.0);
+/// ```
 #[must_use]
 pub fn abs(x: f64) -> f64 {
     if x < 0.0 {

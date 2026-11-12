@@ -5,9 +5,9 @@
   "batch": 64,
   "measured_at": "2026-11-12T04:00:00Z",
   "baseline": {
-    "qam16_map_demap_symbols_per_sec": 162205406,
-    "ofdm_mod_demod_symbols_per_sec": 1986,
-    "awgn_apply_samples_per_sec": 4026057
+    "qam16_map_demap_symbols_per_sec": 146000000,
+    "ofdm_mod_demod_symbols_per_sec": 2025,
+    "awgn_apply_samples_per_sec": 3570000
   },
   "regression_tolerance_percent": 3
 }

@@ -46,6 +46,21 @@ fn gaussian(rng: &mut ChaCha20Rng) -> f64 {
 }
 
 /// AWGN: noise Gaussian nol-sesetimen, variansi N0/2 per dimensi.
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::channel::{Awgn, Channel};
+/// use sig6g_phy::Complex32;
+///
+/// let awgn = Awgn;
+/// let samples = [Complex32::new(10, 0); 4];
+/// let out = awgn.apply(&samples, 20.0, 42).unwrap();
+/// assert_eq!(out.len(), 4);
+/// // Deterministik: seed yang sama menghasilkan output yang sama.
+/// let out2 = awgn.apply(&samples, 20.0, 42).unwrap();
+/// assert_eq!(out, out2);
+/// ```
 pub struct Awgn;
 
 impl Channel for Awgn {
@@ -72,6 +87,20 @@ impl Channel for Awgn {
 }
 
 /// Rayleigh flat fading + AWGN, koheren per simbol.
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::channel::{Rayleigh, Channel};
+/// use sig6g_phy::Complex32;
+///
+/// let rayleigh = Rayleigh;
+/// let samples = [Complex32::new(10, 0); 4];
+/// let out = rayleigh.apply(&samples, 20.0, 42).unwrap();
+/// assert_eq!(out.len(), 4);
+/// let out2 = rayleigh.apply(&samples, 20.0, 42).unwrap();
+/// assert_eq!(out, out2);
+/// ```
 pub struct Rayleigh;
 
 impl Channel for Rayleigh {

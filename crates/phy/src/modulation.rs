@@ -110,6 +110,16 @@ macro_rules! impl_modulation {
 }
 
 /// BPSK: 2 titik, 1 bit/simbol.
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::{Bpsk, Complex32, Modulation};
+///
+/// let c = Bpsk::map(&[1]);
+/// assert_eq!(c, Complex32::new(1, 0));
+/// assert_eq!(Bpsk::demap(c), 1);
+/// ```
 pub struct Bpsk;
 const BPSK: [Complex32; 2] = [
     Complex32::new(-1, 0), // 0
@@ -118,6 +128,16 @@ const BPSK: [Complex32; 2] = [
 impl_modulation!(Bpsk, 2, 1, BPSK);
 
 /// QPSK: 4 titik, 2 bit/simbol (Gray).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::{Qpsk, Complex32, Modulation};
+///
+/// let c = Qpsk::map(&[1, 0]); // binary 10
+/// assert_eq!(c, Complex32::new(1, -1));
+/// assert_eq!(Qpsk::demap(c), 0b10);
+/// ```
 pub struct Qpsk;
 const QPSK: [Complex32; 4] = [
     Complex32::new(-1, -1), // binary 00
@@ -128,6 +148,17 @@ const QPSK: [Complex32; 4] = [
 impl_modulation!(Qpsk, 4, 2, QPSK);
 
 /// 16-QAM: 16 titik, 4 bit/simbol (Gray per sumbu).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::{Qam16, Complex32, Modulation};
+///
+/// // binary 1010 -> simbol 10
+/// let c = Qam16::map(&[1, 0, 1, 0]);
+/// assert_eq!(Qam16::demap(c), 0b1010);
+/// assert_eq!(Qam16::constellation().len(), Qam16::POINTS);
+/// ```
 pub struct Qam16;
 const QAM16_COORDS: [i32; 4] = [-3, -1, 1, 3];
 
@@ -184,6 +215,16 @@ impl Modulation for Qam16 {
 }
 
 /// 64-QAM: 64 titik, 6 bit/simbol (Gray per sumbu).
+///
+/// # Example
+///
+/// ```
+/// use sig6g_phy::{Qam64, Complex32, Modulation};
+///
+/// let c = Qam64::map(&[1, 0, 0, 0, 1, 1]); // binary 100011 = 35
+/// assert_eq!(Qam64::demap(c), 0b100011);
+/// assert_eq!(Qam64::POINTS, 64);
+/// ```
 pub struct Qam64;
 const QAM64_COORDS: [i32; 8] = [-7, -5, -3, -1, 1, 3, 5, 7];
 
