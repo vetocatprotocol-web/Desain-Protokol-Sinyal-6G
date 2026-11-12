@@ -1,0 +1,10 @@
+[package]
+name = "sig6g-link"
+description = "Link layer (typestate connection + frame parser) for the 6G signal protocol framework"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sig6g-core = { path = "../core" }
+
+[dev-dependencies]

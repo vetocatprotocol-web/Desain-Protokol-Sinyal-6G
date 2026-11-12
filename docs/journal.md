@@ -18,3 +18,9 @@ Format: `YYYY-MM-DD | topik | ringkasan | angka/keterangan`
   31 tes lulus, clippy pedantic+nursery -D warnings, fmt bersih.
   Benchmark phy_modem + baseline benches/baselines/phy.json; ci/run-all.sh
   gate regresi <=3% hijau.
+- 2026-11-12 | M2 Link dan typestate (selesai) | crates/link no_std: state machine
+  typestate (Idle -> Acquiring -> Synced -> Connected, transisi ilegal tidak
+  terkompilasi), parser frame zero-copy (magic/ver/type/length/seq/payload/crc16,
+  CRC-16-CCITT), fuzz target frame_parser. 43 tes lulus (core 12 + link 12 +
+  phy 19), clippy pedantic+nursery -D warnings, fmt bersih, semua gerbang
+  CI (termasuk benchmark regresi <=3%) hijau.

@@ -31,10 +31,12 @@ run() {
 }
 
 # --- Benchmark (throughput) dengan regresi <= 3% vs baseline ---
-# Harus menjadi perintah cargo pertama agar kompiler menggunakan profil
-# bench (release-like) dan tidak terpengaruh build debug dari clippy/test.
+# Pemakaian pertama sebagai warmup (mengatasi penyesuaian frekuensi CPU),
+# kedua sebagai pengukuran yang dibandingkan ke baseline. Harus menjadi
+# perintah cargo pertama agar kompiler menggunakan profil bench.
 BASELINE="$ROOT/crates/phy/benches/baselines/phy.json"
 if [ -f "$BASELINE" ]; then
+  cargo bench -p sig6g-phy --bench phy_modem >/dev/null 2>&1 || true # warmup
   BENCH_OUT="$(mktemp)"
   cargo bench -p sig6g-phy --bench phy_modem > "$BENCH_OUT" 2>&1 || {
     log "GAGAL: cargo bench phy_modem"
@@ -107,6 +109,16 @@ if rustup component list --installed 2>/dev/null | grep -q miri; then
   run cargo miri test -p sig6g-core
 else
   log "lewat cargo miri (miri tidak terpasang)"
+fi
+
+# --- Fuzzing (parser frame) jika tersedia ---
+if command -v cargo-fuzz >/dev/null 2>&1; then
+  (cd fuzz && cargo fuzz run frame_parser -max_total_time=60) || {
+    log "GAGAL: cargo fuzz frame_parser"
+    status=1
+  }
+else
+  log "lewat cargo fuzz (cargo-fuzz tidak terpasang)"
 fi
 
 echo

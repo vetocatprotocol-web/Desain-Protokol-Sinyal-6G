@@ -1,0 +1,15 @@
+[package]
+name = "sig6g-fuzz"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sig6g-link = { path = "../crates/link" }
+libfuzzer-sys = "0.5"
+
+[dev-dependencies]
+
+[[bin]]
+name = "frame_parser"
+path = "fuzz_targets/frame_parser.rs"
+required-features = ["fuzz"]

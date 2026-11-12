@@ -18,26 +18,29 @@ use std::time::Instant;
 const N: usize = 64;
 const CP: usize = 16;
 const ITER: usize = 20_000;
+const BATCH: usize = 64; // simbol per iterasi untuk mengamortisasi overhead pengukuran
 
 fn main() {
     // 1) Modulasi/demodulasi throughput (simbol per detik).
-    // Input bervariasi per iterasi agar kompiler tidak menghapus loop.
+    // Setiap iterasi memproses BATCH simbol agar ukuran pengukuran stabil.
     let t0 = Instant::now();
     let mut acc: u64 = 0;
     for i in 0..ITER {
-        let bits: [u8; 4] = [
-            ((i >> 3) & 1) as u8,
-            ((i >> 2) & 1) as u8,
-            ((i >> 1) & 1) as u8,
-            (i & 1) as u8,
-        ];
-        let c = Qam16::map(&bits);
-        let d = Qam16::demap(c);
-        acc = acc.wrapping_add(d as u64);
-        black_box(c);
+        for b in 0..BATCH {
+            let bits: [u8; 4] = [
+                (((i * BATCH + b) >> 3) & 1) as u8,
+                (((i * BATCH + b) >> 2) & 1) as u8,
+                (((i * BATCH + b) >> 1) & 1) as u8,
+                ((i * BATCH + b) & 1) as u8,
+            ];
+            let c = Qam16::map(&bits);
+            let d = Qam16::demap(c);
+            acc = acc.wrapping_add(d as u64);
+        }
     }
     let mod_ns = t0.elapsed().as_nanos();
-    let mod_sps = (ITER as f64) / (mod_ns as f64 / 1_000_000_000.0);
+    let total_syms = (ITER * BATCH) as f64;
+    let mod_sps = total_syms / (mod_ns as f64 / 1_000_000_000.0);
     black_box(acc);
 
     // 2) OFDM modulate/demodulate throughput (simbol OFDM per detik).
@@ -82,7 +85,7 @@ fn main() {
     black_box(awgn_acc);
     black_box(out);
 
-    println!("phy_modem bench (iter={ITER}):");
+    println!("phy_modem bench (iter={ITER}, batch={BATCH}):");
     println!("  qam16_map_demap_symbols_per_sec = {mod_sps:.0}");
     println!("  ofdm_mod_demod_symbols_per_sec  = {ofdm_sps:.0}");
     println!("  awgn_apply_samples_per_sec      = {awgn_sps:.0}");
