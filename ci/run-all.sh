@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ci/run-all — Gerbang CI lokal untuk workspace sig6g (M0 Fondasi).
+# ci/run-all — Gerbang CI lokal untuk workspace sig6g (M1 PHY sintetis).
 #
 # Jalankan seluruh gerbang dari Bagian 7 & 8 AGENTS.md secara lokal.
 # Keluar dengan kode non-nol jika salah satu gerbang gagal.
@@ -29,6 +29,53 @@ run() {
     status=1
   fi
 }
+
+# --- Benchmark (throughput) dengan regresi <= 3% vs baseline ---
+# Harus menjadi perintah cargo pertama agar kompiler menggunakan profil
+# bench (release-like) dan tidak terpengaruh build debug dari clippy/test.
+BASELINE="$ROOT/crates/phy/benches/baselines/phy.json"
+if [ -f "$BASELINE" ]; then
+  BENCH_OUT="$(mktemp)"
+  cargo bench -p sig6g-phy --bench phy_modem > "$BENCH_OUT" 2>&1 || {
+    log "GAGAL: cargo bench phy_modem"
+    status=1
+  }
+  if [ "$status" -eq 0 ]; then
+    get_base() {
+      grep -oE "\"$1\": [0-9]+" "$BASELINE" | head -1 | grep -oE "[0-9]+" | tail -1
+    }
+    get_cur() {
+      grep "$1" "$BENCH_OUT" | head -1 | grep -oE "= *[0-9]+" | head -1 | grep -oE "[0-9]+"
+    }
+    TOL=97 # 100 - 3% toleransi
+    fail_bench=0
+    for metric in qam16_map_demap_symbols_per_sec \
+                  ofdm_mod_demod_symbols_per_sec \
+                  awgn_apply_samples_per_sec; do
+      b="$(get_base "$metric")"
+      c="$(get_cur "$metric")"
+      if [ -z "$b" ] || [ -z "$c" ]; then
+        log "WARN: tidak dapat membaca metrik $metric (baseline=$b sekarang=$c)"
+        continue
+      fi
+      ok="$(awk -v cur="$c" -v base="$b" -v tol="$TOL" \
+        'BEGIN { print (cur * 100 >= base * tol) ? 1 : 0 }')"
+      if [ "$ok" != "1" ]; then
+        log "REGRESI BENCHMARK: $metric sekarang=$c baseline=$b (batas ${TOL}%)"
+        fail_bench=1
+      else
+        log "bench OK: $metric sekarang=$c baseline=$b"
+      fi
+    done
+    if [ "$fail_bench" -ne 0 ]; then
+      status=1
+      log "GAGAL: regresi benchmark melebihi toleransi 3%."
+    fi
+    rm -f "$BENCH_OUT"
+  fi
+else
+  log "lewat benchmark (baseline $BASELINE tidak ditemukan)"
+fi
 
 # --- Bentuk (fmt) ---
 run cargo fmt --all -- --check

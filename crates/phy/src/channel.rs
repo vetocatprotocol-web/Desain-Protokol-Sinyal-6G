@@ -14,12 +14,8 @@ use rand_core::{RngCore, SeedableRng};
 /// Mengembalikan [`Error::ChannelError`] jika kanal gagal memproses sampel.
 #[allow(clippy::missing_errors_doc)]
 pub trait Channel {
-    fn apply(
-        &self,
-        samples: &[Complex32],
-        snr_db: f64,
-        seed: u64,
-    ) -> Result<Vec<Complex32>, Error>;
+    fn apply(&self, samples: &[Complex32], snr_db: f64, seed: u64)
+        -> Result<Vec<Complex32>, Error>;
 }
 
 /// Bangkitkan 32-byte seed dari u64 eksplisit (deterministik).
@@ -107,7 +103,12 @@ impl Channel for Rayleigh {
 }
 
 #[cfg(test)]
-#[allow(clippy::cast_precision_loss, clippy::cast_lossless, clippy::cast_possible_truncation, clippy::uninlined_format_args)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_lossless,
+    clippy::cast_possible_truncation,
+    clippy::uninlined_format_args
+)]
 mod tests {
     use super::*;
 

@@ -239,7 +239,12 @@ const fn make_qam64_const() -> [Complex32; 64] {
 }
 
 #[cfg(test)]
-#[allow(clippy::cast_precision_loss, clippy::cast_lossless, clippy::cast_possible_truncation, clippy::uninlined_format_args)]
+#[allow(
+    clippy::cast_precision_loss,
+    clippy::cast_lossless,
+    clippy::cast_possible_truncation,
+    clippy::uninlined_format_args
+)]
 mod tests {
     use super::*;
 

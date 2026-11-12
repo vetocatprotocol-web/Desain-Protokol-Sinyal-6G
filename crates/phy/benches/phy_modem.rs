@@ -1,5 +1,17 @@
+#![allow(
+    clippy::wildcard_imports,
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_wrap
+)]
+
 use sig6g_core::Complex32;
-use sig6g_phy::{channel::{Awgn, Channel}, modulation::*, ofdm::{Ofdm, OfdmImpl}};
+use sig6g_phy::{
+    channel::{Awgn, Channel},
+    modulation::*,
+    ofdm::{Ofdm, OfdmImpl},
+};
 use std::hint::black_box;
 use std::time::Instant;
 
@@ -60,7 +72,9 @@ fn main() {
     let t0 = Instant::now();
     let mut awgn_acc: u64 = 0;
     for i in 0..ITER {
-        out = Awgn.apply(&samples, 20.0, 7u64.wrapping_add(i as u64)).unwrap();
+        out = Awgn
+            .apply(&samples, 20.0, 7u64.wrapping_add(i as u64))
+            .unwrap();
         awgn_acc = awgn_acc.wrapping_add(out[0].re as u64);
     }
     let awgn_ns = t0.elapsed().as_nanos();
