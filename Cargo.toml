@@ -4,6 +4,7 @@ members = [
     "crates/core",
     "crates/phy",
     "crates/link",
+    "crates/mac",
 ]
 exclude = []
 

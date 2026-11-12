@@ -27,3 +27,13 @@ Format: `YYYY-MM-DD | topik | ringkasan | angka/keterangan`
   Doc examples (runnable) ditambahkan ke semua item publik M1 (Modulation,
   Ofdm, Awgn, Rayleigh, math) dan M2 (Idle/Acquiring/Synced/Connected,
   Frame, parse_frame, serialize_frame) — divalidasi via cargo test --doc.
+- 2026-11-12 | M3 MAC dan penjadwalan (selesai) | crates/mac no_std ditambahkan ke
+  workspace: MacScheduler round-robin multi-UE (MAX_UE=64, eksklusivitas slot,
+  fairness, deterministik per seed, 0 alokasi heap per slot), HarqProcess chase
+  combining (MAX_HARQ_RETRANSMISSIONS=3, state Idle/Pending/Exhausted,
+  on_ack/on_nack/retransmit/reset), Error enum spesifik. Spesifikasi
+  docs/spec/mac.md ditulis. 8 tes unit + 17 doc test lulus. Semua gerbang
+  ci/run-all.sh hijau (fmt, clippy pedantic+nursery -D warnings, test,
+  doc-test, benchmark regresi <=3% semua dalam toleransi). Doc example runnable
+  ditambahkan ke setiap item publik per AGENTS.md §6. Deny/audit/miri/fuzz
+  dilewati (tool tidak terpasang).

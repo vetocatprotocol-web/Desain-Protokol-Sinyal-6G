@@ -1,0 +1,12 @@
+[package]
+name = "sig6g-mac"
+description = "MAC layer (scheduler + HARQ) for the 6G signal protocol framework"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sig6g-core = { path = "../core" }
+rand-chacha = { version = "0.9", default-features = false, package = "rand_chacha" }
+rand-core = { version = "0.9", default-features = false, package = "rand_core" }
+
+[dev-dependencies]
