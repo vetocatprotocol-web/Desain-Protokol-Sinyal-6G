@@ -15,5 +15,7 @@ pub mod buffer;
 pub mod error;
 pub mod numerology;
 
+pub use buffer::Complex32;
+
 #[cfg(test)]
 extern crate alloc;
