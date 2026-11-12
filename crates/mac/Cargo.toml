@@ -10,3 +10,4 @@ rand-chacha = { version = "0.9", default-features = false, package = "rand_chach
 rand-core = { version = "0.9", default-features = false, package = "rand_core" }
 
 [dev-dependencies]
+proptest = { version = "=1.9.0", default-features = false, features = ["std"] }

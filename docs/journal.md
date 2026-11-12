@@ -37,3 +37,15 @@ Format: `YYYY-MM-DD | topik | ringkasan | angka/keterangan`
   doc-test, benchmark regresi <=3% semua dalam toleransi). Doc example runnable
   ditambahkan ke setiap item publik per AGENTS.md §6. Deny/audit/miri/fuzz
   dilewati (tool tidak terpasang).
+- 2026-11-12 | Gap fix M0-M3 (selesai) | Perbaikan gap terhadap Definisi Selesai
+  AGENTS.md §9:
+  * README per crate ditambahkan (core, phy, link, mac) — wajib §9.
+  * proptest =1.9.0 ditambahkan ke dev-dependencies semua crate — wajib §7
+    (properti: 10.000 kasus). getrandom dikunci ke 0.3 (cargo 1.82 tidak
+    mendukung edition2024 yang dibutuhkan getrandom 0.4).
+  * Golden/vektor test di tests/vectors.rs (CRC-16-CCITT, konstelasi QPSK/16-QAM,
+    numerologi) — wajib §7.
+  * Tes determinisme: awgn_deterministic_same_seed (phy proptest) — wajib §7.
+  * decisions.md: fix edisi (2021 bukan 2024), ADR-001 (proptest), ADR-002
+    (README per crate).
+  Semua gerbang ci/run-all.sh hijau setelah gap fix.
