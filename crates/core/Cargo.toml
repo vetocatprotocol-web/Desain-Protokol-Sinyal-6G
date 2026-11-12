@@ -1,0 +1,9 @@
+[package]
+name = "sig6g-core"
+description = "no_std core types for the 6G signal protocol framework"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dev-dependencies]

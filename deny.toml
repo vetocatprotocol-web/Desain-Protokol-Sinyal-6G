@@ -1,0 +1,51 @@
+# cargo-deny configuration for sig6g workspace.
+# See: https://github.com/EmbarkStudios/cargo-deny
+
+version = 1
+
+[[deny]]
+name = "default"
+
+# Licenses allowed for use in this research/simulation project.
+licenses = {
+    allow = {
+        # MIT-like permissive licenses are fine.
+        "MIT",
+        "MIT OR Apache-2.0",
+        "Apache-2.0",
+        "Apache-2.0 OR MIT",
+        "BSD-2-Clause",
+        "BSD-3-Clause",
+        "ISC",
+        "Unlicense",
+        "0BSD",
+        # Rust standard library is dual-licensed.
+        "MIT OR Apache-2.0",
+    },
+    # Anything not in the allow list triggers a deny.
+    deny = {
+        "GPL-*",
+        "LGPL-*",
+        "AGPL-*",
+        "SSPL*",
+    },
+}
+
+# Advisories: deny crates with known vulnerabilities (MSRV-compatible).
+advisories = {
+    vulnerability = { deny = ["unmaintained", "untracked"] },
+    notice = { deny = ["unmaintained"] },
+}
+
+# Prevent duplicate crates with different versions in the graph.
+duplicates = {
+    versions = "deny",
+    features = "deny",
+    names = "deny",
+}
+
+# Lock the dependency graph: no new dependencies without review.
+# bans can be used to block specific crates/versions.
+bans = {
+    crates = [],
+}
