@@ -1,5 +1,6 @@
 use sig6g_core::Complex32;
-use sig6g_phy::{modulation::*, ofdm::OfdmImpl, Channel, Awgn};
+use sig6g_phy::{channel::{Awgn, Channel}, modulation::*, ofdm::{Ofdm, OfdmImpl}};
+use std::hint::black_box;
 use std::time::Instant;
 
 const N: usize = 64;
@@ -8,35 +9,48 @@ const ITER: usize = 20_000;
 
 fn main() {
     // 1) Modulasi/demodulasi throughput (simbol per detik).
-    let bits = [1u8, 0, 1, 1];
+    // Input bervariasi per iterasi agar kompiler tidak menghapus loop.
     let t0 = Instant::now();
-    let mut sink = Complex32::zero();
-    for _ in 0..ITER {
+    let mut acc: u64 = 0;
+    for i in 0..ITER {
+        let bits: [u8; 4] = [
+            ((i >> 3) & 1) as u8,
+            ((i >> 2) & 1) as u8,
+            ((i >> 1) & 1) as u8,
+            (i & 1) as u8,
+        ];
         let c = Qam16::map(&bits);
-        let _d = Qam16::demap(c);
-        sink = c;
+        let d = Qam16::demap(c);
+        acc = acc.wrapping_add(d as u64);
+        black_box(c);
     }
     let mod_ns = t0.elapsed().as_nanos();
     let mod_sps = (ITER as f64) / (mod_ns as f64 / 1_000_000_000.0);
+    black_box(acc);
 
     // 2) OFDM modulate/demodulate throughput (simbol OFDM per detik).
     let ofdm = OfdmImpl::<N, CP>::new();
-    let symbols: [Complex32; N] = std::array::from_fn(|i| {
-        if i % 2 == 0 {
-            Complex32::new(1, 0)
-        } else {
-            Complex32::new(-1, 0)
-        }
-    });
     let mut tx = [Complex32::zero(); N + CP];
     let mut rx = [Complex32::zero(); N];
     let t0 = Instant::now();
-    for _ in 0..ITER {
+    let mut ofdm_acc: u64 = 0;
+    for i in 0..ITER {
+        let symbols: [Complex32; N] = std::array::from_fn(|k| {
+            if ((i + k) & 1) == 0 {
+                Complex32::new(1, 0)
+            } else {
+                Complex32::new(-1, 0)
+            }
+        });
         ofdm.modulate(&symbols, &mut tx).unwrap();
         ofdm.demodulate(&tx, &mut rx).unwrap();
+        ofdm_acc = ofdm_acc.wrapping_add(rx[0].re as u64);
     }
     let ofdm_ns = t0.elapsed().as_nanos();
     let ofdm_sps = (ITER as f64) / (ofdm_ns as f64 / 1_000_000_000.0);
+    black_box(ofdm_acc);
+    black_box(tx);
+    black_box(rx);
 
     // 3) Kanal AWGN throughput (sampel per detik).
     let samples: Vec<Complex32> = std::iter::repeat(Complex32::new(10, 0))
@@ -44,19 +58,18 @@ fn main() {
         .collect();
     let mut out = Vec::with_capacity(samples.len());
     let t0 = Instant::now();
-    for _ in 0..ITER {
-        out = Awgn.apply(&samples, 20.0, 7).unwrap();
+    let mut awgn_acc: u64 = 0;
+    for i in 0..ITER {
+        out = Awgn.apply(&samples, 20.0, 7u64.wrapping_add(i as u64)).unwrap();
+        awgn_acc = awgn_acc.wrapping_add(out[0].re as u64);
     }
     let awgn_ns = t0.elapsed().as_nanos();
     let awgn_sps = ((ITER * samples.len()) as f64) / (awgn_ns as f64 / 1_000_000_000.0);
+    black_box(awgn_acc);
+    black_box(out);
 
     println!("phy_modem bench (iter={ITER}):");
     println!("  qam16_map_demap_symbols_per_sec = {mod_sps:.0}");
     println!("  ofdm_mod_demod_symbols_per_sec  = {ofdm_sps:.0}");
     println!("  awgn_apply_samples_per_sec      = {awgn_sps:.0}");
-    println!("  sink = {sink:?}, out_len = {}", out.len());
-
-    // Baseline tulisan: simpan ke benches/baselines/phy.json oleh skrip CI.
-    let _ = sink;
-    let _ = out;
 }
